@@ -74,3 +74,52 @@ Mudança na configuração da linguagem para pt-BR e horário na settings.py
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 ```
+Criação da tabela no banco de dados através do models.py
+
+```aiignore
+class Dados_orcamento(models.Model):
+    nome_cliente = models.CharField(max_length=100)
+    endereco_logradouro = models.CharField(max_length=100)
+    endereco_numero = models.IntegerField()
+    endereco_cidade = models.CharField(max_length=40)
+    endereco_estado = models.CharField(max_length=2)
+    tipo_imovel = models.CharField(max_length=20)
+    consumo_energia = models.IntegerField(blank=True, null=True)
+    imagem = models.FileField(upload_to='images/orcamento', default=None, null=True, blank=True)
+    data_inicial_orcamento = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=30, default='aguardando' )
+
+    class Meta:
+        db_table = 'orcamento'
+
+    def __str__(self):
+        return self.nome_cliente
+
+```
+
+Inserção das rotas para o armazenamento do arquivo no settings.py
+
+```aiignore
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'public')
+```
+
+Concatenacao das rotas com a a rota estática do urls.py
+
+```
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+Criada apresentação para manipulação do banco de dados no perfil administrador no admin.py
+
+```
+from django.contrib import admin
+from core.models import Dados_orcamento
+
+class EventoAdmin(admin.ModelAdmin):
+    list_display = ('nome_cliente','data_inicial_orcamento')
+
+admin.site.register(Dados_orcamento, EventoAdmin)
+```
